@@ -82,3 +82,9 @@ CVE-2022-5678: TLS handshake vuln ...
 EXPLOIT-12345: OpenSSL RCE exploit
 Link: https://vulners.com/exploit-12345
 ```
+
+---
+
+## License
+This tool is released under the GNU General Public License v3.0.  
+Made by **k2xploit**.
