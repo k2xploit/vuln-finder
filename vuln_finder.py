@@ -4,7 +4,7 @@
 #  Author: k2xploit
 #  Website: https://github.com/k2xploit/vuln-finder
 #
-#  This tool is intended for educational and authorized testing purposes only.
+#  This program is intended for educational and authorized testing purposes only.
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
