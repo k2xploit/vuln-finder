@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -----------------------------------------------------------------------------
 #  vuln_finder.py - CVE & Vulnerability lookup tool
-#  Copyright (C) 2025  k2xploit
-#  Official github repo: https://github.com/k2xploit/vuln-finder
+#  Author: k2xploit
+#  Website: https://github.com/k2xploit/vuln-finder
 #
 #  This tool is intended for educational and authorized testing purposes only.
 #
