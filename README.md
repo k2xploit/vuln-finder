@@ -47,7 +47,7 @@ If not set, Vulners results will be skipped with a warning.
 
 ### Single target:
 ```bash
-./vuln_finder_full.py -s "nginx 1.18.0"
+./vuln_finder.py -s "nginx 1.18.0"
 ```
 
 ### Multiple targets (via file):
@@ -59,7 +59,7 @@ openssl 1.1.1
 
 Run it:
 ```bash
-./vuln_finder_full.py -f input.txt
+./vuln_finder.py -f input.txt
 ```
 
 ---
