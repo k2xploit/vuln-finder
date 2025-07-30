@@ -46,13 +46,13 @@ If not set, Vulners results will be skipped with a warning.
 
 ### Single target:
 ```bash
-./vuln_finder.py -s "nginx 1.18.0"
+./vuln_finder.py -s "proftpd 1.3.5"
 ```
 
 ### Multiple targets (via file):
 Example `input.txt`:
 ```
-nginx 1.18.0
+proftpd 1.3.5
 openssl 1.1.1
 ```
 
