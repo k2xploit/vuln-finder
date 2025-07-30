@@ -20,31 +20,17 @@
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
 
-
 import argparse
 import requests
 import os
 import urllib.parse
 
-OSV_API = "https://api.osv.dev/v1/query"
 VULNERS_API = "https://vulners.com/api/v3/search/lucene/"
-VULNERS_API_KEY = os.getenv("VULNERS_API_KEY")  # Optional: export before use
-
-def query_osv(name, version):
-    data = {"version": version, "package": {"name": name}}
-    try:
-        res = requests.post(OSV_API, json=data)
-        res.raise_for_status()
-        vulns = res.json().get("vulns", [])
-        return vulns
-    except Exception as e:
-        print(f"[!] Error querying OSV for {name} {version}: {e}")
-        return []
+VULNERS_API_KEY = os.getenv("VULNERS_API_KEY")
 
 def query_vulners(name, version):
     if not VULNERS_API_KEY:
-        return None  # Signal that the API key is missing
-
+        return None
     headers = {"Content-Type": "application/json"}
     params = {
         "query": f"{name} {version}",
@@ -53,7 +39,7 @@ def query_vulners(name, version):
     try:
         res = requests.get(VULNERS_API, params=params, headers=headers)
         res.raise_for_status()
-        return res.json().get("data", {}).get("documents", [])
+        return res.json().get("data", {}).get("search", [])
     except Exception as e:
         print(f"[!] Error querying Vulners for {name} {version}: {e}")
         return []
@@ -72,7 +58,6 @@ def parse_input(file=None, single=None):
         if len(parts) >= 2:
             targets.append((parts[0], parts[1]))
     return targets
-
 
 def query_nvd(name, version):
     try:
@@ -113,26 +98,31 @@ def main():
     for name, version in targets:
         print_header(f"Results for: {name} {version}")
 
-        osv_vulns = query_osv(name, version)
         query_nvd(name, version)
-        print("\n--- CVEs from OSV ---")
-        if osv_vulns:
-            for vuln in osv_vulns:
-                print(f"{vuln['id']}: {vuln.get('summary', '')}")
-        else:
-            print("No CVEs found.")
-            
+
         vulners_data = query_vulners(name, version)
         print("\n--- Other Vulnerabilities (Vulners) ---")
         if vulners_data is None:
             print("[!] Skipping Vulners query — API key not set. Export VULNERS_API_KEY to enable this.")
             print("No additional vulnerabilities found.")
-        elif vulners_data:
-            for item in vulners_data:
-                print(f"{item.get('id', 'N/A')}: {item.get('title', '')}")
-                print(f"Link: {item.get('href', '')}\n")
-        else:
+        elif not vulners_data:
+            print("[i] Vulners returned no results — this may be normal on the free tier.")
             print("No additional vulnerabilities found.")
+        else:
+            print(f"[i] Vulners returned {len(vulners_data)} results.")
+            for item in vulners_data:
+                doc_id = item.get('_id', 'N/A')
+                score = item.get('_score', '?')
+                source = item.get('_source', {})
+
+                title = source.get('title')
+                if not title:
+                    desc = source.get('description', '').strip().replace('\n', ' ')
+                    title = desc[:60] + "..." if len(desc) > 60 else desc
+
+                print(f"{doc_id} (score: {score}): {title}")
+                print(f"Link: https://vulners.com/search?query={doc_id}\n")
+
         print("\n")
 
 if __name__ == "__main__":
