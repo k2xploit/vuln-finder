@@ -43,8 +43,8 @@ def query_osv(name, version):
 
 def query_vulners(name, version):
     if not VULNERS_API_KEY:
-        print("[!] Skipping Vulners query — API key not set. Export VULNERS_API_KEY to enable this.")
-        return []
+        return None  # Signal that the API key is missing
+
     headers = {"Content-Type": "application/json"}
     params = {
         "query": f"{name} {version}",
@@ -104,6 +104,9 @@ def main():
     parser.add_argument("-f", "--file", help="File with software and version per line")
     parser.add_argument("-s", "--single", help="Single software and version")
     args = parser.parse_args()
+    if not args.file and not args.single:
+        parser.print_help()
+        exit(1)
 
     targets = parse_input(args.file, args.single)
 
@@ -118,10 +121,13 @@ def main():
                 print(f"{vuln['id']}: {vuln.get('summary', '')}")
         else:
             print("No CVEs found.")
-
+            
         vulners_data = query_vulners(name, version)
         print("\n--- Other Vulnerabilities (Vulners) ---")
-        if vulners_data:
+        if vulners_data is None:
+            print("[!] Skipping Vulners query — API key not set. Export VULNERS_API_KEY to enable this.")
+            print("No additional vulnerabilities found.")
+        elif vulners_data:
             for item in vulners_data:
                 print(f"{item.get('id', 'N/A')}: {item.get('title', '')}")
                 print(f"Link: {item.get('href', '')}\n")
