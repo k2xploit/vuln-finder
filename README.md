@@ -1,6 +1,6 @@
 # vuln_finder
 
-`vuln_finder.py` is a command-line tool that retrieves **known CVEs** and **new or unassigned vulnerabilities** for specified software and version combinations. It leverages trusted sources including **Google OSV**, **NVD**, and **Vulners.com**.
+`vuln_finder.py` is a command-line tool that retrieves **known CVEs** and **new or unassigned vulnerabilities** for specified software and version combinations. It leverages trusted sources including **NVD** and **Vulners.com**.
 
 ---
 
@@ -10,7 +10,6 @@
   - Single software and version
   - Or a file with multiple software+version lines
 - Sources:
-  - [OSV.dev](https://osv.dev) — CVEs and ecosystem-based vulns
   - [NVD](https://nvd.nist.gov) — structured CVE database
   - [Vulners](https://vulners.com) — PoCs, advisories, exploit references
 
@@ -70,9 +69,6 @@ Run it:
 ============================================================
 [+] Results for: openssl 1.1.1
 ============================================================
-
---- CVEs from OSV ---
-GHSA-xxxx: openssl npm package vulnerable to ...
 
 --- CVEs from NVD ---
 CVE-2023-1234: Buffer overflow in ...
