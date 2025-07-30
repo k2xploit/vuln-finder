@@ -24,6 +24,7 @@
 import argparse
 import requests
 import os
+import urllib.parse
 
 OSV_API = "https://api.osv.dev/v1/query"
 VULNERS_API = "https://vulners.com/api/v3/search/lucene/"
@@ -43,8 +44,6 @@ def query_osv(name, version):
 def query_vulners(name, version):
     if not VULNERS_API_KEY:
         print("[!] Skipping Vulners query — API key not set. Export VULNERS_API_KEY to enable this.")
-        return []
-    if not VULNERS_API_KEY:
         return []
     headers = {"Content-Type": "application/json"}
     params = {
@@ -79,7 +78,7 @@ def query_nvd(name, version):
     try:
         query = f"{name} {version}"
         print("\n--- CVEs from NVD ---")
-        url = f"https://services.nvd.nist.gov/rest/json/cves/2.0?keywordSearch={query}"
+        url = f"https://services.nvd.nist.gov/rest/json/cves/2.0?keywordSearch={urllib.parse.quote(query)}"
         res = requests.get(url)
         res.raise_for_status()
         results = res.json().get("vulnerabilities", [])
@@ -87,12 +86,18 @@ def query_nvd(name, version):
             for item in results:
                 cve = item.get("cve", {})
                 cve_id = cve.get("id", "N/A")
-                desc = cve.get("descriptions", [{}])[0].get("value", "")
+                descriptions = cve.get("descriptions", [])
+                desc = descriptions[0].get("value", "") if descriptions else ""
                 print(f"{cve_id}: {desc}")
         else:
             print("No CVEs found.")
     except Exception as e:
         print(f"[!] Error querying NVD for {name} {version}: {e}")
+
+def print_header(title):
+    print("="*60)
+    print(f"[+] {title}")
+    print("="*60)
 
 def main():
     parser = argparse.ArgumentParser(description="Query CVEs and Vulnerabilities")
@@ -103,9 +108,7 @@ def main():
     targets = parse_input(args.file, args.single)
 
     for name, version in targets:
-        print("="*60)
-        print(f"[+] Results for: {name} {version}")
-        print("="*60)
+        print_header(f"Results for: {name} {version}")
 
         osv_vulns = query_osv(name, version)
         query_nvd(name, version)
